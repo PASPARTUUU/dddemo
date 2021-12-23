@@ -14,3 +14,7 @@ type IngredientUseCase interface {
 type ChefUseCase interface {
 	Cook(dish models.Dish) (string, error)
 }
+
+type Cleaning interface {
+	CleanIt() ([]models.Trash, error)
+}

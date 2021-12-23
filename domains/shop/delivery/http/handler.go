@@ -1,16 +1,12 @@
 package http
 
-import (
-	"dddemo/domains/shop/repository/localstorage"
-)
+import "dddemo/domains/shop"
 
 type Handler struct {
 	Dish *HandlerDish
 }
 
-func NewHandler() *Handler {
-
-	dishRepo := localstorage.NewDishLocalStorage()
+func NewHandler(dishRepo shop.DishRepo) *Handler {
 
 	return &Handler{
 		Dish: NewHandlerDish(dishRepo),

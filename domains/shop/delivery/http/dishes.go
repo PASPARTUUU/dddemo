@@ -4,7 +4,7 @@ import (
 	"net/http"
 
 	"dddemo/domains/shop"
-	uc "dddemo/domains/shop/usecase"
+	uc "dddemo/domains/shop/shopusecase"
 
 	"github.com/labstack/echo/v4"
 )
