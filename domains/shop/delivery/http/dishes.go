@@ -5,17 +5,20 @@ import (
 
 	"dddemo/domains/shop"
 	uc "dddemo/domains/shop/shopusecase"
+	"dddemo/pkg/meintemplate"
 
 	"github.com/labstack/echo/v4"
 )
 
 type HandlerDish struct {
-	useCase shop.DishUseCase
+	useCase   shop.DishUseCase
+	templates meintemplate.Templates
 }
 
-func NewHandlerDish(dishRepo shop.DishRepo) *HandlerDish {
+func NewHandlerDish(templates meintemplate.Templates, dishRepo shop.DishRepo) *HandlerDish {
 	return &HandlerDish{
-		useCase: uc.NewDishUseCase(dishRepo),
+		useCase:   uc.NewDishUseCase(dishRepo),
+		templates: templates,
 	}
 }
 

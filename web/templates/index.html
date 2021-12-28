@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang='en'>
+    <head>
+        <meta charset='utf-8'>
+        <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+        <title>{{ template "title" . }}Домашняя страница - Snippetbox</title>
+        <meta name='viewport' content='width=device-width, initial-scale=1'>
+
+        <link rel="stylesheet" type='text/css' media='screen' href="./web/static/style.css" />
+        <link rel="stylesheet" type='text/css' media='screen' href="./domains/shop/web/static/shop.css">
+        <link rel="stylesheet" type='text/css' media='screen' href="./domains/kitchen/web/static/kitchen.css">
+        
+    </head>
+    <body>
+        <header>
+            <h1><a href='/'>Snippetbox</a></h1>
+        </header>
+        <nav>
+            <a href="/">Домашняя страница</a>
+        </nav>
+        <main>
+            <h2>{{ .Title }}</h2>   
+            <p>{{ .Message }}</p>
+            <p> ---------------- </p>
+            {{ template "content" . }}
+        </main>
+        <div class="bla">
+            <p>blablabla</p>
+        </div>
+        
+    </body>
+
+</html>
+
