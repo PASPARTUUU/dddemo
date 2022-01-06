@@ -2,19 +2,19 @@ package models
 
 import "time"
 
-// блюдо
+// Dish - блюдо-кушанье
 type Dish struct {
 	Name   string
 	Recipe string
 }
 
-// ингредиенты для блюд
+// Trash - 
 type Trash struct {
 	Name     string
 	SomeData interface{} // не используется
 }
 
-// ингредиенты для блюд
+// Ingredient - ингредиенты для блюд
 type Ingredient struct {
 	Name string
 	Exp  time.Time
@@ -24,4 +24,17 @@ type Ingredient struct {
 // [#02]
 func (ingr Ingredient) ExpDate() time.Time {
 	return time.Now().Add(time.Hour * 48)
+}
+
+// SidebarMarkup - структура инициализации раздела на боковой панели для домена
+type SidebarMarkup struct {
+	Name       string            // заголовок раздела
+	LI         []SidebarMarkupLI // елементы-ссылки раздела
+	Permission []string
+}
+
+type SidebarMarkupLI struct {
+	Name       string
+	Href       string
+	Permission []string
 }

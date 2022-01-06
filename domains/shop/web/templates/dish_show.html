@@ -1,0 +1,10 @@
+{{ define "title" }} SHOP {{ end }}
+
+{{ define "content" }}
+<div>
+    {{range .Dishes}}
+        <p>{{ .Name }} | {{ .Recipe }} | {{ .Price }}</p>
+        <br>
+    {{end}}
+</div>
+{{ end }}

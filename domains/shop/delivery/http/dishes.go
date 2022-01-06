@@ -1,11 +1,10 @@
 package http
 
 import (
-	"net/http"
-
 	"dddemo/domains/shop"
 	uc "dddemo/domains/shop/shopusecase"
 	"dddemo/pkg/meintemplate"
+	"net/http"
 
 	"github.com/labstack/echo/v4"
 )
@@ -22,13 +21,29 @@ func NewHandlerDish(templates meintemplate.Templates, dishRepo shop.DishRepo) *H
 	}
 }
 
+func (h HandlerDish) TmpCreateDish(ectx echo.Context) error {
+	return h.templates.Render(ectx, 200, "dish_create", nil)
+}
+
 func (h HandlerDish) CreateDish(ectx echo.Context) error {
-	return h.useCase.UCreateDish("Borshch", "potato;tomato;capusto", 123)
+	dishNumber := ectx.Param("number")
+
+	switch dishNumber {
+	case "1":
+		h.useCase.UCreateDish("Borshch", "potato;tomato;kapusto", 123)
+	case "2":
+		h.useCase.UCreateDish("Пельмень", "ком бизнес-логики обернутый тонким интерфейсом", 00)
+	}
+
+	return ectx.Redirect(http.StatusFound, "/tavern/dish/show")
 }
 
 func (h HandlerDish) ShowDishes(ectx echo.Context) error {
 	d, _ := h.useCase.UGetDishes()
-	return ectx.JSON(http.StatusOK, d)
+
+	return h.templates.Render(ectx, 200, "dish_show", map[string]interface{}{
+		"Dishes": d,
+	})
 }
 
 func (h HandlerDish) DeleteDish(ectx echo.Context) error {

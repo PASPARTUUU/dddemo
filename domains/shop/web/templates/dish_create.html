@@ -1,0 +1,13 @@
+{{ define "title" }} SHOP {{ end }}
+
+{{ define "content" }}
+  <form  action="/tavern/dish/create/1" method="POST">
+    <label for="exampleInputEmail1" class="form-label">Borshch</label>
+    <button type="submit" class="btn btn-primary">Create dish</button>
+  </form>
+  <br>
+  <form  action="/tavern/dish/create/2" method="POST">
+    <label for="exampleInputEmail1" class="form-label">Пельмень</label>
+    <button type="submit" class="btn btn-primary">Create dish</button>
+  </form>
+{{ end }}

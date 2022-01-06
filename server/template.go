@@ -8,16 +8,36 @@ import (
 	"path/filepath"
 	"strings"
 
+	"dddemo/models"
 	"dddemo/pkg/slice"
 )
 
+type Dmns struct {
+	SidebarMarkup []models.SidebarMarkup
+	CSSFiles      []string
+	JSFiles       []string
+}
+
+func (srv *Server) domainsInit() Dmns {
+	var dmns Dmns
+
+	for _, d := range srv.domains {
+		dmns.SidebarMarkup = append(dmns.SidebarMarkup, d.SidebarMarkup())
+		dmns.CSSFiles = append(dmns.CSSFiles, d.PathsToCSSFiles()...)
+		dmns.JSFiles = append(dmns.JSFiles, d.PathsToJSFiles()...)
+	}
+
+	return dmns
+}
+
 // parseTemplates parses .html files over base template in given directory and returns them.
-func (serv *Server) parseTemplates(dir string) (map[string]*template.Template, error) {
+func (srv *Server) parseTemplates(dir string) (map[string]*template.Template, error) {
 
 	baseT := template.New("index.html").Funcs(map[string]interface{}{
 		"hello":         func() string { return "HELLLLLOOOOL!" },
 		"add":           func(x, y int) int { return x + y },
 		"hasPermission": func(p string) bool { return true },
+		"domainsInit": srv.domainsInit,
 	})
 
 	list, err := templatesFilesList(dir)
@@ -30,8 +50,6 @@ func (serv *Server) parseTemplates(dir string) (map[string]*template.Template, e
 	if err != nil {
 		return nil, fmt.Errorf("parsing templates: %v", err)
 	}
-
-	// template.C
 
 	templates := make(map[string]*template.Template)
 	fillTmps := func(tmpDir string) error {
@@ -69,7 +87,7 @@ func (serv *Server) parseTemplates(dir string) (map[string]*template.Template, e
 		return nil, fmt.Errorf("fillTmps: %v", err)
 	}
 
-	for _, d := range serv.domains {
+	for _, d := range srv.domains {
 		err = fillTmps(d.RootTemplatesFolder())
 		if err != nil {
 			return nil, fmt.Errorf("fillTmps: %v", err)

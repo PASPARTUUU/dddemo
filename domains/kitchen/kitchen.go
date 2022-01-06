@@ -1,27 +1,29 @@
 package kitchen
 
 import (
+	"dddemo/models"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"runtime"
 )
 
-type DomainKitchen struct {
+type DomainKitchenMeta struct {
 	Name string
 }
 
-func NewKitchen() *DomainKitchen {
-	return &DomainKitchen{
-		Name: "kitchen",
+func NewKitchen() *DomainKitchenMeta {
+	return &DomainKitchenMeta{
+		Name: "Kitchen",
 	}
 }
 
-func (s DomainKitchen) DomainName() string {
-	return s.Name
+func (d DomainKitchenMeta) DomainName() string {
+	return d.Name
 }
 
-func (s DomainKitchen) RootFolderPath() string {
+func (d DomainKitchenMeta) RootFolderPath() string {
 
 	_, file, _, ok := runtime.Caller(0)
 	if !ok {
@@ -41,6 +43,69 @@ func (s DomainKitchen) RootFolderPath() string {
 	return fmt.Sprintf("./%s", rel)
 }
 
-func (s DomainKitchen) RootTemplatesFolder() string {
-	return fmt.Sprintf("./%s/web/templates", s.RootFolderPath())
+func (d DomainKitchenMeta) RootTemplatesFolder() string {
+	return fmt.Sprintf("%s/web/templates", d.RootFolderPath())
+}
+
+func (d DomainKitchenMeta) PathsToCSSFiles() []string {
+	var res []string
+
+	files, err := filesList(fmt.Sprintf("./%s/web/static", d.RootFolderPath()))
+	if err != nil {
+		panic(err)
+	}
+
+	for _, v := range files {
+		if path.Ext(v) == ".css" {
+			res = append(res, fmt.Sprintf("/%s", v))
+		}
+	}
+
+	return res
+}
+func (d DomainKitchenMeta) PathsToJSFiles() []string {
+	var res []string
+
+	files, err := filesList(fmt.Sprintf("./%s/web/static", d.RootFolderPath()))
+	if err != nil {
+		panic(err)
+	}
+
+	for _, v := range files {
+		if path.Ext(v) == ".js" {
+			res = append(res, fmt.Sprintf("/%s", v))
+		}
+	}
+
+	return res
+}
+
+func (d DomainKitchenMeta) SidebarMarkup() models.SidebarMarkup {
+	return models.SidebarMarkup{
+		Name: d.DomainName(),
+		LI: []models.SidebarMarkupLI{
+			{
+				Name: "Hello",
+				Href: "/tavern/kitchen/hello",
+			},
+		},
+	}
+}
+
+func filesList(dir string) ([]string, error) {
+	result := make([]string, 0, 185)
+	p := filepath.Join(dir)
+	err := filepath.Walk(p,
+		func(path string, info os.FileInfo, err error) error {
+			if err != nil {
+				return err
+			}
+			if !info.IsDir() {
+				result = append(result, path)
+			}
+
+			return nil
+		})
+
+	return result, err
 }

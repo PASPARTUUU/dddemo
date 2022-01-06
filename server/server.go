@@ -1,10 +1,10 @@
 package server
 
 import (
-	"fmt"
-
 	"github.com/labstack/echo/v4"
+	"github.com/sirupsen/logrus"
 
+	"dddemo/pkg/meinlogger"
 	"dddemo/pkg/meintemplate"
 	servicehttp "dddemo/service/delivery/http"
 
@@ -39,8 +39,6 @@ type Server struct {
 	templates meintemplate.Templates
 }
 
-type TempPath struct{}
-
 func NewServer() *Server {
 	var err error
 
@@ -61,7 +59,6 @@ func NewServer() *Server {
 
 	server.templates, err = server.parseTemplates("./web/templates")
 	if err != nil {
-		fmt.Printf("err server.parseTemplates: %v\n", err)
 		panic(err)
 	}
 
@@ -77,8 +74,12 @@ func NewServer() *Server {
 func (s *Server) Run() error {
 
 	e := echo.New()
+	e.Use(meinlogger.LogrusMiddleware)
+	// e.Logger = &meinlogger.MeinLogger{Logger: logrus.New()}
+
 	// e.Use(middleware.Static("./static"))
-	e.Static("/web/static", "./web/static")
+	// e.Static("/web/static", "./web/static")
+	e.Static("/", "./")
 
 	eg := e.Group("/tavern")
 
@@ -98,13 +99,13 @@ func (s *Server) hello(ectx echo.Context) error {
 		Title   string
 		Message string
 	}{
-		Title:   "Последние заметки",
-		Message: "Здесь пока ничего нет!",
+		Title:   "11111",
+		Message: "222222",
 	}
 
 	err = s.templates.Render(ectx, 200, "aaa", data)
 	if err != nil {
-		fmt.Printf("err: %v\n", err)
+		logrus.Error(err)
 		return err
 	}
 

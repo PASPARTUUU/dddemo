@@ -7,7 +7,6 @@ import (
 func RegisterHTTPEndpoints(router *echo.Group, h *Handler) {
 
 	kitchen := router.Group("/kitchen")
-	kitchen.Static("/domains/kitchen/web/static", "./domains/kitchen/web/static")
 	{
 		kitchen.GET("/hello", h.hello)
 	}
