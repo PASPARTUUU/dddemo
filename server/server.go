@@ -1,6 +1,11 @@
 package server
 
 import (
+	"embed"
+	"fmt"
+	"io/fs"
+	"net/http"
+
 	"github.com/labstack/echo/v4"
 	"github.com/sirupsen/logrus"
 
@@ -20,8 +25,12 @@ import (
 	// ---
 	shophttp "dddemo/domains/shop/delivery/http"
 	shopstorage "dddemo/domains/shop/repository/localstorage"
+
 	// shopstorage "dddemo/domains/shop/repository/localstorage"
 	// shopusecase "dddemo/domains/shop/usecase"
+
+	// ---
+	root "dddemo"
 )
 
 type Server struct {
@@ -33,10 +42,12 @@ type Server struct {
 	ShopHandler    *shophttp.Handler
 
 	// ---
-
 	domains []Domain
-	// templates map[string]*template.Template
+	// ---
 	templates meintemplate.Templates
+	// ---
+	embedWeb     embed.FS
+	embedDomains embed.FS
 }
 
 func NewServer() *Server {
@@ -55,9 +66,12 @@ func NewServer() *Server {
 
 		// ---
 		domains: []Domain{shop.NewShop(), kitchen.NewKitchen()},
+		// ---
+		embedWeb:     root.EmbedWeb,
+		embedDomains: root.EmbedDomains,
 	}
 
-	server.templates, err = server.parseTemplates("./web/templates")
+	server.templates, err = server.parseTemplates("web/templates")
 	if err != nil {
 		panic(err)
 	}
@@ -79,7 +93,28 @@ func (s *Server) Run() error {
 
 	// e.Use(middleware.Static("./static"))
 	// e.Static("/web/static", "./web/static")
-	e.Static("/", "./")
+	// e.Static("/", "./")
+
+	{ 
+		// https://echo.labstack.com/cookbook/embed-resources/
+		
+		fsys, err := fs.Sub(s.embedWeb, "web/static")
+		if err != nil {
+			panic(err)
+		}
+		assetHandler := http.FileServer(http.FS(fsys))
+		e.GET("/", echo.WrapHandler(assetHandler))
+		e.GET("/web/static/*", echo.WrapHandler(http.StripPrefix("/web/static/", assetHandler)))
+
+		for _, d := range s.domains {
+			df := d.RootStaticFolder()
+			dfsys, err := fs.Sub(s.embedDomains, df)
+			if err != nil {
+				panic(err)
+			}
+			e.GET(fmt.Sprint("/", df, "/*"), echo.WrapHandler(http.StripPrefix(fmt.Sprint("/", df, "/"), http.FileServer(http.FS(dfsys)))))
+		}
+	}
 
 	eg := e.Group("/tavern")
 
@@ -103,7 +138,7 @@ func (s *Server) hello(ectx echo.Context) error {
 		Message: "222222",
 	}
 
-	err = s.templates.Render(ectx, 200, "aaa", data)
+	err = s.templates.Render(ectx, 200, "hello", data)
 	if err != nil {
 		logrus.Error(err)
 		return err

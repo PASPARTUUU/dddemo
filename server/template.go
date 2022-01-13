@@ -1,10 +1,9 @@
 package server
 
 import (
+	"embed"
 	"fmt"
 	"html/template"
-	"io/ioutil"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -37,33 +36,29 @@ func (srv *Server) parseTemplates(dir string) (map[string]*template.Template, er
 		"hello":         func() string { return "HELLLLLOOOOL!" },
 		"add":           func(x, y int) int { return x + y },
 		"hasPermission": func(p string) bool { return true },
-		"domainsInit": srv.domainsInit,
+		"domainsInit":   srv.domainsInit,
 	})
 
-	list, err := templatesFilesList(dir)
+	// Добавляем частные темплейты из других директорий.
+	baseT, err := baseT.ParseFS(srv.embedWeb, dir+"/*")
 	if err != nil {
 		return nil, err
 	}
 
-	// Добавляем частные темплейты из других директорий.
-	baseT, err = baseT.ParseFiles(list...)
-	if err != nil {
-		return nil, fmt.Errorf("parsing templates: %v", err)
-	}
-
 	templates := make(map[string]*template.Template)
-	fillTmps := func(tmpDir string) error {
-		files, err := ioutil.ReadDir(tmpDir)
+	fillTmps := func(fs embed.FS, tmpDir string) error {
+
+		filesInfo, err := fs.ReadDir(tmpDir)
 		if err != nil {
-			return fmt.Errorf("read dir: %v", err)
+			return err
 		}
 
-		for _, info := range files {
+		for _, info := range filesInfo {
 			if info.IsDir() || !slice.ContainsString(filepath.Ext(info.Name()), []string{".gohtml", ".html"}) || info.Name() == "index.gohtml" {
 				continue
 			}
 
-			t, err := template.Must(baseT.Clone()).ParseFiles(filepath.Join(tmpDir, info.Name()))
+			t, err := template.Must(baseT.Clone()).ParseFS(fs, filepath.Join(tmpDir, info.Name()))
 			if err != nil {
 				return fmt.Errorf("parse template %v: %v", info.Name(), err)
 			}
@@ -82,13 +77,13 @@ func (srv *Server) parseTemplates(dir string) (map[string]*template.Template, er
 		return nil
 	}
 
-	err = fillTmps(dir)
+	err = fillTmps(srv.embedWeb, dir)
 	if err != nil {
 		return nil, fmt.Errorf("fillTmps: %v", err)
 	}
 
 	for _, d := range srv.domains {
-		err = fillTmps(d.RootTemplatesFolder())
+		err = fillTmps(srv.embedDomains, d.RootTemplatesFolder())
 		if err != nil {
 			return nil, fmt.Errorf("fillTmps: %v", err)
 		}
@@ -98,21 +93,3 @@ func (srv *Server) parseTemplates(dir string) (map[string]*template.Template, er
 }
 
 var ErrNoPermission = fmt.Errorf("you have no permissions for that")
-
-func templatesFilesList(dir string) ([]string, error) {
-	result := make([]string, 0, 185)
-	p := filepath.Join(dir)
-	err := filepath.Walk(p,
-		func(path string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-			if !info.IsDir() {
-				result = append(result, path)
-			}
-
-			return nil
-		})
-
-	return result, err
-}

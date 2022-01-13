@@ -1,4 +1,4 @@
-package kitchen
+package shop
 
 import (
 	"dddemo/models"
@@ -9,21 +9,21 @@ import (
 	"runtime"
 )
 
-type DomainKitchenMeta struct {
+type DomainShop struct {
 	Name string
 }
 
-func NewKitchen() *DomainKitchenMeta {
-	return &DomainKitchenMeta{
-		Name: "Kitchen",
+func NewShop() *DomainShop {
+	return &DomainShop{
+		Name: "Shop",
 	}
 }
 
-func (d DomainKitchenMeta) DomainName() string {
+func (d DomainShop) DomainName() string {
 	return d.Name
 }
 
-func (d DomainKitchenMeta) RootFolderPath() string {
+func (d DomainShop) RootFolderPath() string {
 
 	_, file, _, ok := runtime.Caller(0)
 	if !ok {
@@ -40,14 +40,17 @@ func (d DomainKitchenMeta) RootFolderPath() string {
 		panic(err)
 	}
 
-	return fmt.Sprintf("./%s", rel)
+	return rel
 }
 
-func (d DomainKitchenMeta) RootTemplatesFolder() string {
+func (d DomainShop) RootTemplatesFolder() string {
 	return fmt.Sprintf("%s/web/templates", d.RootFolderPath())
 }
+func (d DomainShop) RootStaticFolder() string {
+	return fmt.Sprintf("%s/web/static", d.RootFolderPath())
+}
 
-func (d DomainKitchenMeta) PathsToCSSFiles() []string {
+func (d DomainShop) PathsToCSSFiles() []string {
 	var res []string
 
 	files, err := filesList(fmt.Sprintf("./%s/web/static", d.RootFolderPath()))
@@ -63,7 +66,7 @@ func (d DomainKitchenMeta) PathsToCSSFiles() []string {
 
 	return res
 }
-func (d DomainKitchenMeta) PathsToJSFiles() []string {
+func (d DomainShop) PathsToJSFiles() []string {
 	var res []string
 
 	files, err := filesList(fmt.Sprintf("./%s/web/static", d.RootFolderPath()))
@@ -80,13 +83,21 @@ func (d DomainKitchenMeta) PathsToJSFiles() []string {
 	return res
 }
 
-func (d DomainKitchenMeta) SidebarMarkup() models.SidebarMarkup {
+func (d DomainShop) SidebarMarkup() models.SidebarMarkup {
 	return models.SidebarMarkup{
 		Name: d.DomainName(),
 		LI: []models.SidebarMarkupLI{
 			{
 				Name: "Hello",
-				Href: "/tavern/kitchen/hello",
+				Href: "/tavern/shop/hello",
+			},
+			{
+				Name: "Show Dishes",
+				Href: "/tavern/dish/show",
+			},
+			{
+				Name: "Create Dish",
+				Href: "/tavern/dish/tmp_create",
 			},
 		},
 	}

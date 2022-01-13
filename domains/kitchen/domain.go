@@ -1,4 +1,4 @@
-package shop
+package kitchen
 
 import (
 	"dddemo/models"
@@ -9,21 +9,21 @@ import (
 	"runtime"
 )
 
-type DomainShop struct {
+type DomainKitchenMeta struct {
 	Name string
 }
 
-func NewShop() *DomainShop {
-	return &DomainShop{
-		Name: "Shop",
+func NewKitchen() *DomainKitchenMeta {
+	return &DomainKitchenMeta{
+		Name: "Kitchen",
 	}
 }
 
-func (d DomainShop) DomainName() string {
+func (d DomainKitchenMeta) DomainName() string {
 	return d.Name
 }
 
-func (d DomainShop) RootFolderPath() string {
+func (d DomainKitchenMeta) RootFolderPath() string {
 
 	_, file, _, ok := runtime.Caller(0)
 	if !ok {
@@ -40,14 +40,17 @@ func (d DomainShop) RootFolderPath() string {
 		panic(err)
 	}
 
-	return fmt.Sprintf("./%s", rel)
+	return rel
 }
 
-func (d DomainShop) RootTemplatesFolder() string {
+func (d DomainKitchenMeta) RootTemplatesFolder() string {
 	return fmt.Sprintf("%s/web/templates", d.RootFolderPath())
 }
+func (d DomainKitchenMeta) RootStaticFolder() string {
+	return fmt.Sprintf("%s/web/static", d.RootFolderPath())
+}
 
-func (d DomainShop) PathsToCSSFiles() []string {
+func (d DomainKitchenMeta) PathsToCSSFiles() []string {
 	var res []string
 
 	files, err := filesList(fmt.Sprintf("./%s/web/static", d.RootFolderPath()))
@@ -63,7 +66,7 @@ func (d DomainShop) PathsToCSSFiles() []string {
 
 	return res
 }
-func (d DomainShop) PathsToJSFiles() []string {
+func (d DomainKitchenMeta) PathsToJSFiles() []string {
 	var res []string
 
 	files, err := filesList(fmt.Sprintf("./%s/web/static", d.RootFolderPath()))
@@ -80,21 +83,13 @@ func (d DomainShop) PathsToJSFiles() []string {
 	return res
 }
 
-func (d DomainShop) SidebarMarkup() models.SidebarMarkup {
+func (d DomainKitchenMeta) SidebarMarkup() models.SidebarMarkup {
 	return models.SidebarMarkup{
 		Name: d.DomainName(),
 		LI: []models.SidebarMarkupLI{
 			{
 				Name: "Hello",
-				Href: "/tavern/shop/hello",
-			},
-			{
-				Name: "Show Dishes",
-				Href: "/tavern/dish/show",
-			},
-			{
-				Name: "Create Dish",
-				Href: "/tavern/dish/tmp_create",
+				Href: "/tavern/kitchen/hello",
 			},
 		},
 	}
