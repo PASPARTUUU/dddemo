@@ -8,37 +8,35 @@
     <title>{{ template "title" . }}Привет CMS!</title>
 
 
-    <!-- Bootstrap CSS -->
-    <link href="/web/static/bootstrap.min.css" rel="stylesheet">
+    <!-- Bulma CSS -->
+    <link href="/web/static/bulma.min.css" rel="stylesheet">
     <link href="/web/static/style.css" rel="stylesheet">
-    <link href="/domains/shop/web/static/shop.css" rel="stylesheet">
+
     {{range $domains.CSSFiles}}
     <link href="{{.}}" rel="stylesheet">
     {{end}}
   
-    
-    <script src="/web/static/bootstrap.bundle.min.js" type="text/javascript"></script>
-    <script src="/web/static/sidebars.js" type="text/javascript"></script>
     {{range $domains.JSFiles}}
     <script src="{{.}}" type="text/javascript"></script>
     {{end}}
 
   </head>
   <body>
-    <h1>Привет CMS!</h1>
-   
-    <div class="container-fluid">
-        <div class="row">
-            <div class="col-md-3 sidebar flex-shrink-0 p-3 border" > <!-- side bar -->
-                <p class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
-                    <span class="fs-5 fw-semibold">Domains</span>
-                </p>
-                {{ template "sidebar" . }}
-            </div>
-            <!-- !!! -->
-            <div class="col-md-9 main">{{ template "content" . }}</div>
+    <div class="box"><h1><a href="/hello">Привет CMS!</a></h1></div>
+
+    <section class="columns is-fullheight">
+      <div class="column is-3 section box p-4 pl-5">
+        <p class="menu-label is-size-4 has-text-info">Domains</p>
+        {{ template "sidebar" . }}
+      </div>
+  
+      <div class="column is-9 container box">
+        <div class="section">
+          {{ template "content" . }}
         </div>
-    </div>
+      </div>
+
+    </section>
 
   </body>
 </html>

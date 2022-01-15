@@ -1,20 +1,14 @@
 
 {{ define "sidebar" }}
 {{ $domains := domainsInit }}
-<ul class="list-unstyled ps-0">
+<aside class="menu"></aside>
   {{range $domains.SidebarMarkup}}
-  <li class="mb-1">
-    <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#{{ .Name }}-collapse" aria-expanded="true">
-      Home {{ .Name }}
-    </button>
-    <div class="collapse show" id="{{ .Name }}-collapse">
-      <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-        {{range .LI}}
-          <li><a href="{{.Href}}" class="link-dark rounded">{{.Name}}</a></li>
-        {{end}}
-      </ul>
-    </div>
-  </li>
+  <p class="menu-label is-size-5 has-text-black title mb-2 mt-2">Home {{.Name}}</p>
+  <ul class="menu-list">
+    {{range .LI}}
+      <li><a href="{{.Href}}" class="link-dark rounded">{{.Name}}</a></li>
+    {{end}}
+  </ul>
   {{end}}
-</ul>
+</aside>
 {{ end }}
